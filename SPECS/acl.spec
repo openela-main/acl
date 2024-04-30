@@ -1,7 +1,7 @@
 Summary: Access control list utilities
 Name: acl
 Version: 2.3.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 BuildRequires: gawk
 BuildRequires: gcc
 BuildRequires: gettext
@@ -14,6 +14,10 @@ Source: https://download-mirror.savannah.gnu.org/releases/acl/acl-%{version}.tar
 
 # avoid permission denied problem with LD_PRELOAD in the test-suite
 Patch1: 0001-acl-2.2.53-test-runwrapper.patch
+
+# preserve failed setfacl return code (RHEL-11833)
+# https://git.savannah.nongnu.org/cgit/acl.git/commit/?id=7ce89c695e76ec41fcebd83f8b728f63b0361a2d
+Patch2: 0001-acl-2.3.1-setfacl-preserve-failed-status.patch
 
 License: GPLv2+
 URL: https://savannah.nongnu.org/projects/acl
@@ -119,6 +123,9 @@ rm -rf $RPM_BUILD_ROOT%{_docdir}/%{name}*
 %{_libdir}/libacl.so.*
 
 %changelog
+* Fri Oct 06 2023 Lukáš Zaoral <lzaoral@redhat.com> - 2.3.1-4
+- preserve failed setfacl return code (RHEL-11833)
+
 * Mon Aug 09 2021 Mohan Boddu <mboddu@redhat.com> - 2.3.1-3
 - Rebuilt for IMA sigs, glibc 2.34, aarch64 flags
   Related: rhbz#1991688
