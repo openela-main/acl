@@ -1,9 +1,9 @@
 Summary: Access control list utilities
 Name: acl
 Version: 2.2.53
-Release: 1%{?dist}
+Release: 3%{?dist}
 BuildRequires: gawk
-BuildRequires: gettext
+BuildRequires: gettext-devel
 BuildRequires: libattr-devel
 BuildRequires: libtool
 Requires: libacl = %{version}-%{release}
@@ -11,6 +11,13 @@ Source: https://download-mirror.savannah.gnu.org/releases/acl/acl-%{version}.tar
 
 License: GPLv2+
 URL: https://savannah.nongnu.org/projects/acl
+
+# avoid permission denied problem with LD_PRELOAD in the test-suite
+Patch1: 0001-acl-2.2.53-test-runwrapper.patch
+
+# preserve failed setfacl return code (RHEL-3909)
+# https://git.savannah.nongnu.org/cgit/acl.git/commit/?id=7ce89c695e76ec41fcebd83f8b728f63b0361a2d
+Patch2: 0001-acl-2.2.53-setfacl-preserve-failed-status.patch
 
 %description
 This package contains the getfacl and setfacl utilities needed for
@@ -41,6 +48,9 @@ defined in POSIX 1003.1e draft standard 17.
 %prep
 %autosetup -p1
 
+# newer autoconf fixes rpath warnings from rpminspect
+autoreconf -fvi
+
 %build
 %configure
 
@@ -48,7 +58,7 @@ defined in POSIX 1003.1e draft standard 17.
 # sed -i 's/-O2/-O0/' libtool include/builddefs
 # unset CFLAGS
 
-make %{?_smp_mflags}
+%make_build
 
 %check
 if ./setfacl -m "u:$(id -u):rwx" .; then
@@ -69,14 +79,14 @@ if ./setfacl -m "u:$(id -u):rwx" .; then
     fi
 
     # run the upstream test-suite
-    make check || exit $?
+    %make_build check || exit $?
 else
     echo '*** ACLs are probably not supported by the file system,' \
          'the test-suite will NOT run ***'
 fi
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
+%make_install
 
 # get rid of libacl.a and libacl.la
 rm -f $RPM_BUILD_ROOT%{_libdir}/libacl.a
@@ -113,6 +123,13 @@ rm -rf $RPM_BUILD_ROOT%{_docdir}/%{name}*
 %{_libdir}/libacl.so.*
 
 %changelog
+* Fri Oct 06 2023 Lukáš Zaoral <lzaoral@redhat.com> - 2.2.53-3
+- fix RPATH rpminspect reports
+- actually apply an included patch
+
+* Fri Oct 06 2023 Lukáš Zaoral <lzaoral@redhat.com> - 2.2.53-2
+- preserve failed setfacl return code (RHEL-3909)
+
 * Mon Jul 02 2018 Kamil Dudka <kdudka@redhat.com> 2.2.53-1
 - new upstream release
 
