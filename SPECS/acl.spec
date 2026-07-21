@@ -1,7 +1,7 @@
 Summary: Access control list utilities
 Name: acl
-Version: 2.3.1
-Release: 4%{?dist}
+Version: 2.4.0
+Release: 1%{?dist}
 BuildRequires: gawk
 BuildRequires: gcc
 BuildRequires: gettext
@@ -9,15 +9,13 @@ BuildRequires: libattr-devel
 BuildRequires: libtool
 BuildRequires: make
 BuildRequires: perl(FileHandle)
+BuildRequires: gnupg2
 Requires: libacl%{?_isa} = %{version}-%{release}
-Source: https://download-mirror.savannah.gnu.org/releases/acl/acl-%{version}.tar.gz
 
-# avoid permission denied problem with LD_PRELOAD in the test-suite
-Patch1: 0001-acl-2.2.53-test-runwrapper.patch
-
-# preserve failed setfacl return code (RHEL-11833)
-# https://git.savannah.nongnu.org/cgit/acl.git/commit/?id=7ce89c695e76ec41fcebd83f8b728f63b0361a2d
-Patch2: 0001-acl-2.3.1-setfacl-preserve-failed-status.patch
+Source0: https://download-mirror.savannah.gnu.org/releases/acl/acl-%{version}.tar.gz
+Source1: https://download-mirror.savannah.gnu.org/releases/acl/acl-%{version}.tar.gz.sig
+# Retreived from https://savannah.nongnu.org/people/viewgpg.php?user_id=15000
+Source2: agruen-key.gpg
 
 License: GPLv2+
 URL: https://savannah.nongnu.org/projects/acl
@@ -47,6 +45,7 @@ programs which make use of the access control list programming interface
 defined in POSIX 1003.1e draft standard 17.
 
 %prep
+%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %autosetup -p1
 
 %build
@@ -123,6 +122,11 @@ rm -rf $RPM_BUILD_ROOT%{_docdir}/%{name}*
 %{_libdir}/libacl.so.*
 
 %changelog
+* Thu Jun 25 2026 Lukáš Zaoral <lzaoral@redhat.com> - 2.4.0-1
+- rebase to 2.4.0 to fix the following CVEs:
+  - CVE-2026-54369 - Symlink traversal privilege escalation via libacl functions (RHEL-186111)
+  - CVE-2026-54370 - TOCTOU Symlink Traversal via getfacl/setfacl (RHEL-186216)
+
 * Fri Oct 06 2023 Lukáš Zaoral <lzaoral@redhat.com> - 2.3.1-4
 - preserve failed setfacl return code (RHEL-11833)
 
