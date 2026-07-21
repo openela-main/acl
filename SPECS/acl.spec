@@ -1,7 +1,7 @@
 Summary: Access control list utilities
 Name: acl
-Version: 2.3.2
-Release: 4%{?dist}
+Version: 2.4.0
+Release: 1%{?dist}
 BuildRequires: gawk
 BuildRequires: gcc
 BuildRequires: gettext
@@ -14,18 +14,9 @@ Requires: libacl%{?_isa} = %{version}-%{release}
 Source0: https://download-mirror.savannah.gnu.org/releases/acl/acl-%{version}.tar.gz
 Source1: https://download-mirror.savannah.gnu.org/releases/acl/acl-%{version}.tar.gz.sig
 # Retreived from https://savannah.nongnu.org/people/viewgpg.php?user_id=15000
-# Source2: agruen-key.gpg
+Source2: agruen-key.gpg
 # Retrieved from https://savannah.nongnu.org/people/viewgpg.php?user_id=42032
-Source2: vapier-key.gpg
-
-# avoid permission denied problem with LD_PRELOAD in the test-suite
-Patch1: 0001-acl-2.2.53-test-runwrapper.patch
-
-# fix regressions introduced by the `libacl: use getpwnam_r and getgrnam_r in acl_from_text.c` patch
-# https://git.savannah.nongnu.org/cgit/acl.git/commit/?id=56abe432b65801f31277fb9a3bca0f9e31502315
-Patch2: 0001-acl-2.3.2-__acl_get_uid-fix-memory-wasting-loop.patch
-# https://lists.nongnu.org/archive/html/acl-devel/2024-06/msg00000.html
-Patch3: 0001-acl-2.3.2-tests-fix-getpwnam-and-getgrnam.patch
+# Source2: vapier-key.gpg
 
 License: GPL-2.0-or-later AND LGPL-2.1-or-later
 URL: https://savannah.nongnu.org/projects/acl
@@ -132,6 +123,11 @@ rm -rf $RPM_BUILD_ROOT%{_docdir}/%{name}*
 %{_libdir}/libacl.so.*
 
 %changelog
+* Thu Jun 25 2026 Lukáš Zaoral <lzaoral@redhat.com> - 2.4.0-1
+- rebase to 2.4.0 to fix the following CVEs:
+  - CVE-2026-54369 - Symlink traversal privilege escalation via libacl functions (RHEL-186106)
+  - CVE-2026-54370 - TOCTOU Symlink Traversal via getfacl/setfacl (RHEL-186207)
+
 * Tue Oct 29 2024 Troy Dawson <tdawson@redhat.com> - 2.3.2-4
 - Bump release for October 2024 mass rebuild:
   Resolves: RHEL-64018
