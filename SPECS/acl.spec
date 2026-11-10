@@ -1,7 +1,7 @@
 Summary: Access control list utilities
 Name: acl
 Version: 2.4.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 BuildRequires: gawk
 BuildRequires: gcc
 BuildRequires: gettext
@@ -122,10 +122,10 @@ rm -rf $RPM_BUILD_ROOT%{_docdir}/%{name}*
 %{_libdir}/libacl.so.*
 
 %changelog
-* Thu Jun 25 2026 Lukáš Zaoral <lzaoral@redhat.com> - 2.4.0-1
+* Wed Jul 22 2026 Lukáš Zaoral <lzaoral@redhat.com> - 2.4.0-2
 - rebase to 2.4.0 to fix the following CVEs:
-  - CVE-2026-54369 - Symlink traversal privilege escalation via libacl functions (RHEL-186111)
-  - CVE-2026-54370 - TOCTOU Symlink Traversal via getfacl/setfacl (RHEL-186216)
+  - CVE-2026-54369 - Symlink traversal privilege escalation via libacl functions
+  - CVE-2026-54370 - TOCTOU Symlink Traversal via getfacl/setfacl
 
 * Fri Oct 06 2023 Lukáš Zaoral <lzaoral@redhat.com> - 2.3.1-4
 - preserve failed setfacl return code (RHEL-11833)
